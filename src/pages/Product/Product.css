@@ -42,6 +42,7 @@
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
+  color: solid black;
 }
 
 .input-box label {
@@ -63,11 +64,11 @@
   gap: 20px;
 }
 
-.laba-info {
+.laba {
   margin: 15px 0;
   font-size: 18px;
   font-weight: bold;
-  color: #006d44;
+  color: #d9d9d9;
 }
 
 .action-buttons {
@@ -76,8 +77,8 @@
   margin-top: 20px;
 }
 
-.btn-orange1 {
-  background-color: #006d44;
+.btn-simpan {
+  background-color: #939191;
   border: none;
   padding: 5px 35px;
   border-radius: 10px;
@@ -85,13 +86,13 @@
   cursor: pointer;
 }
 
-.btn-orange1:hover {
+.btn-simpan:hover {
   transition-delay: 0.1s;
   transform: scale(1.07);
 }
 
 .btn-orange2 {
-  background-color:#ff4d4d;
+  background-color: #ff4d4d;
   border: none;
   padding: 5px 35px;
   border-radius: 10px;
@@ -105,13 +106,13 @@
 }
 
 .hamburger {
-    display: none;
-    /* Muncul hanya di mobile */
-    font-size: 1.5rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: block;
+  display: none;
+  /* Muncul hanya di mobile */
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: block;
 }
 
 .upload-container {
@@ -205,7 +206,7 @@
 }
 
 .btn-orange1 {
-  background-color:#1D9E75;
+  background-color: #1D9E75;
   border: none;
   padding: 10px 25px;
   border-radius: 10px;

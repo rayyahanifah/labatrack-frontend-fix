@@ -73,12 +73,6 @@ function Login() {
                         />
                     </div>
 
-                    <div className="forgot-password-container">
-                        <a href="/forgot-password" className="forgot-password-link">
-                            Lupa password?
-                        </a>
-                    </div>
-
                     <button type="submit" className="btn-login" disabled={isLoading}>
                         {isLoading ? "Memproses..." : "Masuk"}
                     </button>

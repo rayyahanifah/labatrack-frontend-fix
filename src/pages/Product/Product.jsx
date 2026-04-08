@@ -128,7 +128,7 @@ function Product() {
             <div className="form-layout">
               <div className="form-left">
                 <div className="input-box">
-                  <label>Nama produk</label>
+                  <label>Nama produk : </label>
                   <input
                     type="text"
                     required
@@ -139,7 +139,7 @@ function Product() {
                 </div>
 
                 <div className="input-box">
-                  <label>Kategori</label>
+                  <label>Kategori : </label>
                   <input
                     type="text"
                     value={product.category}
@@ -150,7 +150,7 @@ function Product() {
 
                 <div className="input-row">
                   <div className="input-box">
-                    <label>Harga jual</label>
+                    <label>Harga jual : </label>
                     <input
                       type="number"
                       required
@@ -161,7 +161,7 @@ function Product() {
                     />
                   </div>
                   <div className="input-box">
-                    <label>HPP (Harga Modal)</label>
+                    <label>HPP (Harga Modal) : </label>
                     <input
                       type="number"
                       required
@@ -173,7 +173,7 @@ function Product() {
                 </div>
 
                 <div className="input-box">
-                  <label>Stok Awal</label>
+                  <label>Stok Awal : </label>
                   <input
                     type="number"
                     value={product.stock === 0 ? "" : product.stock}
@@ -182,12 +182,12 @@ function Product() {
                   />
                 </div>
 
-                <div className="laba-info">
+                <div className="laba">
                   Estimasi Laba per Item: <strong>Rp {estimasiLaba.toLocaleString("id-ID")}</strong>
                 </div>
 
                 <div className="action-buttons">
-                  <button type="submit" className="btn-orange1" disabled={isLoading}>
+                  <button type="submit" className="btn-simpan" disabled={isLoading}>
                     {isLoading ? "Menyimpan..." : "Simpan"}
                   </button>
                   <button type="button" className="btn-orange2" onClick={() => navigate("/dashboard")}>Batal</button>

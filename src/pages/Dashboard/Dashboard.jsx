@@ -3,6 +3,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api"; 
 
+// Import Asset
+import logoLaba from "../../assets/menejemenproduct.png";
+import logoLabaTrack from "../../assets/logo-labatrack.png";
+
 function Dashboard() {
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -20,10 +24,10 @@ function Dashboard() {
             try {
                 const res = await api.get("/api/reports/dashboard-summary");
                 
-                // Ambil semua transaksi
+                // Ambil data dari backend
                 const allRecent = res.data.recent;
                 
-                // Filter hanya yang tanggalnya HARI INI untuk counter stat
+                // Filter transaksi hari ini untuk counter
                 const today = new Date().toLocaleDateString('id-ID');
                 const todayTransactions = allRecent.filter(tx => 
                     new Date(tx.created_at).toLocaleDateString('id-ID') === today
@@ -31,7 +35,7 @@ function Dashboard() {
 
                 setStats({
                     labaHariIni: res.data.stats.labaHariIni,
-                    transaksiHariIni: todayTransactions.length // Angka ini sekarang akurat
+                    transaksiHariIni: todayTransactions.length
                 });
                 setRecentTransactions(allRecent);
             } catch (err) {
@@ -42,6 +46,7 @@ function Dashboard() {
     }, []);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+    
     const onClickLogout = () => {
         localStorage.removeItem("user");
         navigate("/login");
@@ -49,7 +54,9 @@ function Dashboard() {
 
     return (
         <div className="container">
+            {/* 1. SIDEBAR */}
             <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+
                 <nav className="menu">
                     <button className="menu-item active">Dashboard</button>
                     <button className="menu-item" onClick={() => navigate("/cashier")}>Cashier</button>
@@ -60,37 +67,39 @@ function Dashboard() {
                 <div className="profile-card">
                     <div className="profile-main" onClick={() => setIsProfileOpen(!isProfileOpen)} style={{ cursor: 'pointer' }}>
                         <div className="profile-info-wrapper">
-                            <span className="avatar">{user?.store_name?.charAt(0).toUpperCase() || "U"}</span>
-                            <span>{user?.store_name || "User"}</span>
+                            <span className="avatar">{user?.store_name?.charAt(0).toUpperCase() || "M"}</span>
+                            <span>{user?.store_name || "mantap"}</span>
                         </div>
                         <span className={`arrow ${isProfileOpen ? 'rotate' : ''}`}>▼</span>
                     </div>
                     {isProfileOpen && (
                         <div className="profile-options">
-                            <button className="profile-opt-btn logout" onClick={onClickLogout}>⏻ Log out</button>
+                            <button className="profile-opt-btn">📝 Edit Profile</button>
+                            <button className="profile-opt-btn logout" onClick={onClickLogout}>🚪 Log out</button>
                         </div>
                     )}
                 </div>
             </aside>
 
+            {/* 2. MAIN CONTENT */}
             <div className="main">
                 <header className="top-header">
                     <button className="hamburger" onClick={toggleSidebar}>☰</button>
                 </header>
-                
-                {/* Bagian Log out atas dihapus/disembunyikan sesuai gambar terbaru */}
 
                 <div className="content">
                     <div className="header-title">
                         <h1>Dashboard 🔥</h1>
-                        <p>Selamat datang kembali, <b>{user?.store_name}</b>!</p>
+                        <p>Selamat datang kembali, <b>{user?.store_name || "mantap"}</b>!</p>
                     </div>
 
+                    {/* Laba Card Section */}
                     <div className="stats-container">
                         <div className="stat-card laba-full">
                             <div className="stat-main-info">
                                 <h3>Laba Hari ini</h3>
                                 <div className="stat-content">
+                                    <img src={logoLaba} alt="icon laba" className="icon-laba-img" />
                                     <span className="stat-value">Rp {stats.labaHariIni.toLocaleString('id-ID')}</span>
                                 </div>
                             </div>
@@ -100,6 +109,7 @@ function Dashboard() {
                         </div>
                     </div>
 
+                    {/* Transaction History Section */}
                     <div className="transaction-section">
                         <div className="section-title">
                             <span className="icon-history">⏳</span>
@@ -119,7 +129,7 @@ function Dashboard() {
                                     <tbody>
                                         {recentTransactions.map((tx) => (
                                             <tr key={tx.id}>
-                                                <td>#{tx.id.toString().slice(-5)}</td>
+                                                <td className="tx-id">#{tx.id}</td>
                                                 <td>
                                                     <span className={`method-badge ${tx.payment_method?.toLowerCase()}`}>
                                                         {tx.payment_method}
@@ -129,6 +139,9 @@ function Dashboard() {
                                                 <td>{new Date(tx.created_at).toLocaleDateString('id-ID')}</td>
                                             </tr>
                                         ))}
+                                        {recentTransactions.length === 0 && (
+                                            <tr><td colSpan="4" style={{textAlign: 'center', padding: '20px'}}>Belum ada transaksi</td></tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
