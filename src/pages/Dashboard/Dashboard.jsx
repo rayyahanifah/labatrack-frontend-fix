@@ -116,29 +116,31 @@ function Dashboard() {
                         <div className="table-scroll-wrapper">
                             <div className="table-container">
                                 <table className="transaction-table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Metode</th>
-                                            <th>Total</th>
-                                            <th>Waktu</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {recentTransactions.map((tx) => (
-                                            <tr key={tx.id}>
-                                                <td className="tx-id">#{tx.id}</td>
-                                                <td>
-                                                    <span className={`method-badge ${tx.payment_method?.toLowerCase()}`}>
-                                                        {tx.payment_method}
-                                                    </span>
-                                                </td>
-                                                <td className="amount-cell">Rp {tx.total_amount.toLocaleString('id-ID')}</td>
-                                                <td>{new Date(tx.created_at).toLocaleDateString('id-ID')}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+    <thead>
+        <tr>
+            {/* Ganti ID jadi No */}
+            <th>No</th> 
+            <th>Metode</th>
+            <th>Total</th>
+            <th>Waktu</th>
+        </tr>
+    </thead>
+    <tbody>
+        {recentTransactions.map((tx, index) => (
+            <tr key={tx.id}>
+                {/* Pakai index + 1 supaya nomornya urut 1, 2, 3... */}
+                <td className="tx-id">{index + 1}</td>
+                <td>
+                    <span className={`method-badge ${tx.payment_method?.toLowerCase()}`}>
+                        {tx.payment_method}
+                    </span>
+                </td>
+                <td className="amount-cell">Rp {tx.total_amount.toLocaleString('id-ID')}</td>
+                <td>{new Date(tx.created_at).toLocaleDateString('id-ID')}</td>
+            </tr>
+        ))}
+    </tbody>
+</table>
                             </div>
                         </div>
                     </div>

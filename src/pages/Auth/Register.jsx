@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../api"; // Pastikan path ke api.js sudah benar
+import api from "../../api";
 import "./Register.css";
+import { motion } from "framer-motion"; // 1. Import Framer Motion
 
-// Import Asset (Pastikan file-nya ada di folder assets)
 import userIcon from "../../assets/logo2.svg";
 import lockIcon from "../../assets/logo3.svg";
 import emailIcon from "../../assets/logo1.svg";
@@ -12,8 +12,6 @@ import mainLogo from "../../assets/logo-labatrack.png";
 function Register() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-
-    // State untuk menampung input user
     const [storeName, setStoreName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -21,21 +19,15 @@ function Register() {
     const handleRegister = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-
         try {
-            // Mengirim data ke backend menggunakan instance axios 'api'
             const response = await api.post("/api/auth/signup", {
                 store_name: storeName,
                 email: email,
                 password: password
             });
-
-            // Jika sukses, munculkan pesan dan pindah ke login
             alert(response.data.message || "Pendaftaran Berhasil!");
             navigate("/login");
-
         } catch (err) {
-            // Mengambil pesan error dari backend (Supabase/Node.js)
             const errorMessage = err.response?.data?.message || "Terjadi kesalahan pada server";
             alert(errorMessage);
         } finally {
@@ -46,8 +38,13 @@ function Register() {
     return (
         <div className="auth-container">
             <div className="auth-box">
-                {/* PANEL KIRI: Branding & Navigasi ke Login */}
-                <div className="auth-left">
+                {/* 2. Tambahkan motion.div dengan animasi slide dari kiri */}
+                <motion.div 
+                    className="auth-left"
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                >
                     <img
                         className="logo"
                         src={mainLogo}
@@ -62,56 +59,63 @@ function Register() {
                     <button className="btn-orange" onClick={() => navigate("/login")}>
                         Masuk Sekarang
                     </button>
-                </div>
+                </motion.div>
 
-                {/* PANEL KANAN: Form Register */}
-                <div className="auth-right">
-                    <h2>Buat Akun Baru</h2>
+                {/* 3. Tambahkan motion.div dengan animasi slide dari kanan */}
+                <motion.div 
+                    className="auth-right"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                >
+                    <motion.h2 
+                        initial={{ y: -19, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                    >
+                        Buat Akun Baru
+                    </motion.h2>
                     <p>Lengkapi info di bawah untuk mendaftarkan tokomu</p>
 
                     <form className="auth-form" onSubmit={handleRegister}>
-                        {/* Input Nama Toko */}
-                        <div className="input-group">
-                            <img src={userIcon} className="input-icon" alt="user" />
-                            <input 
-                                type="text" 
-                                placeholder="Nama Toko" 
-                                value={storeName}
-                                onChange={(e) => setStoreName(e.target.value)}
-                                required 
-                            />
-                        </div>
+                        {/* 4. Animasi stagger (muncul satu per satu) pada input */}
+                        {[ 
+                            { icon: userIcon, val: storeName, set: setStoreName, ph: "Nama Toko", type: "text" },
+                            { icon: emailIcon, val: email, set: setEmail, ph: "Email Aktif", type: "email" },
+                            { icon: lockIcon, val: password, set: setPassword, ph: "Password", type: "password" }
+                        ].map((input, i) => (
+                            <motion.div 
+                                className="input-group" 
+                                key={i}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 + (i * 0.1) }}
+                            >
+                                <img src={input.icon} className="input-icon" alt="icon" />
+                                <input 
+                                    type={input.type} 
+                                    placeholder={input.ph} 
+                                    value={input.val}
+                                    onChange={(e) => input.set(e.target.value)}
+                                    required 
+                                />
+                            </motion.div>
+                        ))}
 
-                        {/* Input Email */}
-                        <div className="input-group">
-                            <img src={emailIcon} className="input-icon" alt="email" />
-                            <input 
-                                type="email" 
-                                placeholder="Email Aktif" 
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required 
-                            />
-                        </div>
-
-                        {/* Input Password */}
-                        <div className="input-group">
-                            <img src={lockIcon} className="input-icon" alt="lock" />
-                            <input 
-                                type="password" 
-                                placeholder="Password" 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required 
-                            />
-                        </div>
-
-                        {/* Tombol Submit */}
-                        <button type="submit" className="btn-green" disabled={isLoading}>
+                        <motion.button 
+                            type="submit" 
+                            className="btn-green" 
+                            disabled={isLoading}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.9 }}
+                        >
                             {isLoading ? "Sedang Memproses..." : "Daftar Gratis"}
-                        </button>
+                        </motion.button>
                     </form>
-                </div>
+                </motion.div>
             </div>
         </div>
     );
