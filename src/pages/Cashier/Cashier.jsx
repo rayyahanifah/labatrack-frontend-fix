@@ -14,7 +14,6 @@ function Cashier() {
     const [paymentMethod, setPaymentMethod] = useState("Cash");
     const [isLoading, setIsLoading] = useState(false);
     
-    // --- TAMBAHAN: Ambil data user dari localStorage ---
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")));
 
     const onClickLogout = () => {
@@ -35,10 +34,21 @@ function Cashier() {
         fetchProducts();
     }, []);
 
-    // 2. Fungsi Tambah ke Keranjang
+    // 2. Fungsi Tambah ke Keranjang (DENGAN VALIDASI STOK)
     const addToCart = (product) => {
+        // FITUR 1: Cek stok awal
+        if (product.stock <= 0) {
+            return alert(`Maaf, stok ${product.name} sudah habis!`);
+        }
+
         const existingItem = cart.find((item) => item.product_id === product.id);
+
         if (existingItem) {
+            // FITUR 2: Cek apakah qty di cart sudah mencapai batas stok
+            if (existingItem.quantity >= product.stock) {
+                return alert("Stok tidak mencukupi untuk ditambah lagi.");
+            }
+
             setCart(cart.map((item) =>
                 item.product_id === product.id ? { ...item, quantity: item.quantity + 1 } : item
             ));
@@ -52,11 +62,21 @@ function Cashier() {
         }
     };
 
-    // 3. Update Quantity di Cart
+    // 3. Update Quantity di Cart (DENGAN VALIDASI STOK)
     const updateQty = (id, delta) => {
+        // Ambil data produk asli untuk tau stok max-nya
+        const originalProduct = products.find(p => p.id === id);
+
         setCart(cart.map(item => {
             if (item.product_id === id) {
                 const newQty = item.quantity + delta;
+                
+                // Jika user klik (+), cek stok dulu
+                if (delta > 0 && newQty > originalProduct.stock) {
+                    alert("Stok terbatas!");
+                    return item;
+                }
+
                 return newQty > 0 ? { ...item, quantity: newQty } : item;
             }
             return item;
@@ -68,7 +88,7 @@ function Cashier() {
         setCart(cart.filter(item => item.product_id !== id));
     };
 
-    // 5. Kirim Transaksi ke Backend
+    // 5. Checkout
     const handleCheckout = async () => {
         if (cart.length === 0) return alert("Keranjang masih kosong!");
         setIsLoading(true);
@@ -80,7 +100,12 @@ function Cashier() {
             };
 
             const response = await api.post("/api/transactions", payload);
-            alert(`Transaksi Berhasil! Total: Rp ${response.data.total_bayar.toLocaleString('id-ID')}`);
+            alert(`Transaksi Berhasil!`);
+            
+            // Refresh produk agar stok di UI update setelah berkurang
+            const resProd = await api.get("/api/products");
+            setProducts(resProd.data);
+            
             setCart([]); 
         } catch (err) {
             alert(err.response?.data?.error || "Terjadi kesalahan transaksi");
@@ -102,20 +127,16 @@ function Cashier() {
                     <button className="menu-item" onClick={() => navigate("/calculator")}>Calculator</button>
                 </nav>
 
-                {/* --- UPDATE: Bagian Profile Card --- */}
                 <div className="profile-card">
                     <div className="profile-main" onClick={() => setIsProfileOpen(!isProfileOpen)} style={{ cursor: 'pointer' }}>
                         <div className="profile-info-wrapper">
-                            {/* Inisial diambil dari store_name */}
                             <span className="avatar">
                                 {user?.store_name?.charAt(0).toUpperCase() || "U"}
                             </span>
-                            {/* Nama toko muncul di sini */}
                             <span>{user?.store_name || "User"}</span>
                         </div>
                         <span className={`arrow ${isProfileOpen ? 'rotate' : ''}`}>🔻</span>
                     </div>
-                    {/* DROPDOWN KE BAWAH (SESUAI REQUEST) */}
                     {isProfileOpen && (
                         <div className="profile-options-dropdown">
                             <button className="profile-opt-btn logout-text" onClick={onClickLogout}>
@@ -138,10 +159,25 @@ function Cashier() {
                     {products.map((prod) => (
                         <div 
                             key={prod.id} 
-                            className="product-placeholder" 
+                            className={`product-placeholder ${prod.stock <= 0 ? 'disabled' : ''}`} 
                             onClick={() => addToCart(prod)} 
-                            style={{ position: 'relative', overflow: 'hidden' }}
+                            style={{ 
+                                position: 'relative', 
+                                overflow: 'hidden',
+                                cursor: prod.stock <= 0 ? 'not-allowed' : 'pointer',
+                                filter: prod.stock <= 0 ? 'grayscale(1)' : 'none',
+                                opacity: prod.stock <= 0 ? 0.7 : 1
+                            }}
                         >
+                            {/* FITUR 3: Badge Habis */}
+                            {prod.stock <= 0 && (
+                                <div style={{
+                                    position: 'absolute', top: '10px', left: '10px',
+                                    background: 'red', color: 'white', padding: '2px 8px',
+                                    borderRadius: '5px', fontSize: '10px', fontWeight: 'bold', zIndex: 10
+                                }}>HABIS</div>
+                            )}
+
                             {prod.image_url ? (
                                 <img src={prod.image_url} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             ) : (
@@ -149,19 +185,13 @@ function Cashier() {
                             )}
 
                             <div className="prod-info-overlay" style={{ 
-                                position: 'absolute', 
-                                bottom: 0, 
-                                background: 'rgba(0,0,0,0.7)', 
-                                color: 'white', 
-                                width: '100%', 
-                                padding: '5px 0',
-                                textAlign: 'center' 
+                                position: 'absolute', bottom: 0, 
+                                background: 'rgba(0,0,0,0.7)', color: 'white', 
+                                width: '100%', padding: '5px 0', textAlign: 'center' 
                             }}>
-                                <div style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'capitalize' }}>
-                                    {prod.name}
-                                </div>
+                                <div style={{ fontSize: '12px', fontWeight: 'bold' }}>{prod.name}</div>
                                 <div style={{ fontSize: '10px' }}>
-                                    Rp {prod.sell_price.toLocaleString('id-ID')}
+                                    Stok: {prod.stock} | Rp {prod.sell_price.toLocaleString('id-ID')}
                                 </div>
                             </div>
                         </div>
@@ -211,7 +241,7 @@ function Cashier() {
                     </select>
                     <div className="btn-group">
                         <button className="btn-check" onClick={handleCheckout} disabled={isLoading}>
-                            {isLoading ? "Loading..." : "Checkout"}
+                            {isLoading ? "Wait..." : "Checkout"}
                         </button>
                         <button className="btn-clear" onClick={() => setCart([])}>Clear</button>
                     </div>
