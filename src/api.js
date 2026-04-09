@@ -1,10 +1,9 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import axios from "axios";
 
 const api = axios.create({
-    baseURL: API_URL,
-    withCredentials: true // WAJIB: Supaya cookie JWT otomatis terkirim ke backend
+  // Pakai URL dari .env, kalau ga ada baru localhost
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000", 
+  withCredentials: true
 });
 
 export default api;
