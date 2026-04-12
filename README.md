@@ -36,16 +36,79 @@
 | **Deployment** | Vercel (Production Ready) |
 
 ---
+## 🗄️ Setup Database (Supabase)
+1. Buat project baru di [supabase.com](https://supabase.com/)
+2. Masuk ke menu **SQL Editor**
+3. Jalankan script SQL berikut untuk membuat tabel:
+```query
+-- 1. Tabel Users
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    store_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_users_email ON users(email); -
 
+-- 2. Tabel Products
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100) DEFAULT 'Umum',
+    base_price DECIMAL(15, 2) NOT NULL,
+    sell_price DECIMAL(15, 2) NOT NULL,
+    stock INT DEFAULT 0,
+    image_url TEXT, 
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_products_user_id ON products(user_id); 
+
+-- 3. Tabel Transactions
+CREATE TABLE transactions (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    total_amount DECIMAL(15, 2) NOT NULL,
+    total_profit DECIMAL(15, 2) NOT NULL,
+    payment_method VARCHAR(50) CHECK (payment_method IN ('Cash', 'QRIS', 'E-Wallet', 'Transfer')) DEFAULT 'Cash',
+    transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_transactions_user_date ON transactions(user_id, transaction_date); 
+
+-- 4. Tabel Transaction_Details
+CREATE TABLE transaction_details (
+    id SERIAL PRIMARY KEY,
+    transaction_id INT REFERENCES transactions(id) ON DELETE CASCADE,
+    product_id INT REFERENCES products(id) ON DELETE SET NULL,
+    quantity INT NOT NULL,
+    subtotal DECIMAL(15, 2) NOT NULL
+);
+CREATE INDEX idx_details_transaction_id ON transaction_details(transaction_id);
+
+-- 5. Tabel Streaks
+CREATE TABLE streaks (
+    id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    current_streak INT DEFAULT 0,
+    last_streak INT DEFAULT 0,
+    longest_streak INT DEFAULT 0,
+    last_transaction_date DATE
+);
+
+```
+
+---
 ## 🚀 Dokumentasi & Langkah Replikasi (Local Setup)
 
 Ikuti langkah berikut untuk menjalankan LabaTrack di lingkungan lokal Anda menggunakan database Supabase yang sudah ada:
 
 ### 1. Clone Repositori
-# Clone Frontend
+### Clone Frontend
 git clone https://github.com/rayyahanifah/labatrack.git
 
-# Clone Backend
+### Clone Backend
 git clone https://github.com/rayyahanifah/labatrack-backend.git
 
 ### 2. Konfigurasi Backend (Express.js)
