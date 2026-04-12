@@ -67,7 +67,7 @@ JWT_SECRET=kode_rahasia_jwt_anda
 PORT=3000
 ```
 
-3. Konfigurasi Frontend (React)
+### 3. Konfigurasi Frontend (React)
 Buka terminal baru untuk menjalankan antarmuka aplikasi:
 
 1. `cd labatrack`
@@ -78,6 +78,56 @@ Buka terminal baru untuk menjalankan antarmuka aplikasi:
 VITE_API_URL=http://localhost:3000
 ```
 Jalankan aplikasi: `npm run dev`
+
+### 5. Buka di browser
+
+`http://localhost:3000`
+
+## 📁 Struktur Folder
+
+```env
+labatrack/
+├── public/                 # File statis (favicon, index.html, dll.)
+├── src/
+│   ├── assets/             # Asset gambar, icon, dan styling global
+│   ├── components/         # Komponen UI yang reusable (Navbar, Button, dll.)
+│   ├── pages/              # Halaman utama aplikasi
+│   │   ├── Auth/           
+│   │   │   ├── Register.css
+│   │   │   └── Register.jsx
+│   │   ├── Calculator/
+│   │   │   ├── Calculator.css
+│   │   │   └── Calculator.jsx
+│   │   ├── Cashier/
+│   │   │   ├── Cashier.css
+│   │   │   └── Cashier.jsx
+│   │   ├── Dashboard/
+│   │   │   ├── Dashboard.css
+│   │   │   └── Dashboard.jsx
+│   │   ├── LandingPage/
+│   │   │   ├── LandingPage.css
+│   │   │   └── LandingPage.jsx
+│   │   ├── LoginPage/
+│   │   │   ├── LoginPage.css
+│   │   │   └── LoginPage.jsx
+│   │   └── Product/
+│   │       ├── Product.css
+│   │       └── Product.jsx
+│   ├── api.js              # Konfigurasi koneksi API (Axios/Fetch)
+│   ├── App.css             # Styling utama untuk App.jsx
+│   ├── App.jsx             # Root component & konfigurasi routing
+│   ├── index.css           # Styling global tingkat atas
+│   └── main.jsx            # Entry point utama untuk React & Vite
+├── .env                    # Variabel lingkungan (rahasia/konfigurasi)
+├── .gitignore              # Daftar file yang diabaikan oleh Git
+├── eslint.config.js        # Konfigurasi linter untuk menjaga kualitas kode
+├── index.html              # Template HTML utama
+├── package-lock.json       # Versi detail dependensi yang terkunci
+├── package.json            # Daftar library dan script project
+├── README.md               # Dokumentasi proyek ini
+└── vite.config.js          # Konfigurasi utama build tool Vite
+```
+---
 
 ### 👥 Tim Pengembang (Fullstack Squad)
 Proyek ini dikembangkan oleh:
